@@ -29,20 +29,28 @@ class RMPSpider(Spider):
         body_dic = json.loads(body)
         docs = body_dic['response']['docs']
         for doc in docs:
-            id = doc['pk_id'] 
+            id = doc['pk_id']
             url = base_url + "ShowRatings.jsp?tid=%d" %id
             try:
-                quality = doc['averageratingscore_rf']            
+                quality = doc['averageratingscore_rf']
             except:
                 quality = 0
             meta = {'tid' : id,
-                    'n_rating' : doc['total_number_of_ratings_i'], 
+                    'n_rating' : doc['total_number_of_ratings_i'],
                     'sid' : int(doc['schoolid_s']),
                     'pfname' : doc['teacherfirstname_t'],
                     'plname' : doc['teacherlastname_t'],
                     'quality': quality
                     }
             yield Request(url, meta = meta, callback = self.parse_prof)
+
+    def diff2float(self, value):
+        v = value.replace("\r\n",'').replace(' ','')
+        try:
+            v = float(v)
+        except:
+            v = -1.0
+        return v
 
     def parse_prof(self, response):
         departxpath = "//*[@id='mainContent']//div[@class='result-title']/text()"
@@ -53,7 +61,7 @@ class RMPSpider(Spider):
 
         l = ItemLoader(item = ProfessorItem(), response = response)
         l.default_output_processor = TakeFirst()
-        
+
         l.add_value('tid', response.meta['tid'])
         l.add_value('sid', response.meta['sid'])
         l.add_value('pfname', response.meta['pfname'])
@@ -65,8 +73,8 @@ class RMPSpider(Spider):
 
         l.add_xpath('department', departxpath, re = 'Professor in the (.+) department')
         l.add_xpath('university', univerxpath)
-        l.add_xpath('difficulty', difficxpath, MapCompose(lambda p: float(p.replace("\r\n",'').replace(' ',''))))
-        
+        l.add_xpath('difficulty', difficxpath, MapCompose(self.diff2float))
+
         keys = l.get_xpath(kxpath, MapCompose(lambda p: p.replace(' ','')))
         values = l.get_xpath(vxpath, MapCompose(lambda p: int(p.strip('(').strip(')'))))
         l.add_value('tags', json.dumps(dict(zip(keys, values))))
@@ -104,7 +112,7 @@ class RMPSpider(Spider):
             l.add_value('rStatus', rating['rStatus'])
             l.add_value('rTextBookUse', rating['rTextBookUse'])
             l.add_value('rWouldTakeAgain', rating['rWouldTakeAgain'])
-            
+
             l.add_value('takenForCredit', rating['takenForCredit'])
             l.add_value('teacher', rating['teacher'])
             l.add_value('teacherGrade', rating['teacherGrade'])
@@ -113,7 +121,3 @@ class RMPSpider(Spider):
             values = [1]*len(keys)
             l.add_value('tags', json.dumps(dict(zip(keys,values))))
             yield l.load_item()
-
-
-
-

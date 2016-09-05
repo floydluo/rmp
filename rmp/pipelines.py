@@ -6,13 +6,13 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 from sqlalchemy.orm import sessionmaker
-from rmp.models import Professor, Rating, db_connect, create_table
+from rmp.models import Professor, Rating, mdb_connect, create_table
 import os
 
 class RmpPipeline(object):
 
     def __init__ (self):
-        engine = db_connect(os.getcwd())
+        engine = mdb_connect()
         create_table(engine)
         Session = sessionmaker(bind = engine)
         self.session = Session()
@@ -36,6 +36,6 @@ class RmpPipeline(object):
                 self.session.rollback()
                 raise
         self.session.commit()
-        
+
 
         return item

@@ -1,4 +1,4 @@
-import os 
+import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,8 +9,15 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
 
-def db_connect(basedir, name = "data"):
+def sdb_connect(basedir, name = "data"):
+    # For SQLite database.
     return create_engine('sqlite:///' + os.path.join(basedir, name + '.sqlite'))
+
+
+def mdb_connect():
+    # For MySQL database.
+    MySQL_DB = 'mysql+mysqlconnector://root:woai19950920@localhost:3306/rmp?charset=utf8'
+    return create_engine(MySQL_DB)
 
 
 Base = declarative_base()
@@ -25,17 +32,17 @@ class Professor(Base):
     tid = Column(Integer)
     sid = Column(Integer)
 
-    pfname = Column(String)
-    plname = Column(String)
-    pname = Column(String)
-    department = Column(String)
-    university = Column(String)
+    pfname = Column(String(30))
+    plname = Column(String(30))
+    pname = Column(String(50))
+    department = Column(String(30))
+    university = Column(String(30))
 
     quality = Column(Float)
     difficulty = Column(Float)
     n_rating = Column(Integer)
-    
-    tags = Column(String)
+
+    tags = Column(Text)
 
     def __repr__(self):
         return "<Professor(name = %r)>" %self.pname
@@ -50,34 +57,28 @@ class Rating(Base):
     tid = Column(Integer)
     sid = Column(Integer)
 
-    attendance = Column(String)
+    attendance = Column(String(30))
     helpCount = Column(Integer)
     notHelpCount = Column(Integer)
 
     rClarity = Column(Float)
-    rClass = Column(String)
+    rClass = Column(String(30))
     rComments = Column(Text)
-    rDate = Column(String)
+    rDate = Column(String(30))
     rEasy = Column(Float)
-    rErrorMsg = Column(String)
+    rErrorMsg = Column(String(30))
     rHelpful = Column(Float)
-    rInterest = Column(String)
+    rInterest = Column(String(30))
     rOverall = Column(Float)
     rStatus = Column(Integer)
-    rTextBookUse = Column(String)
-    rWouldTakeAgain = Column(String)
+    rTextBookUse = Column(String(30))
+    rWouldTakeAgain = Column(String(30))
 
-    takenForCredit = Column(String)
-    teacher = Column(String)
-    teacherGrade = Column(String)
+    takenForCredit = Column(String(30))
+    teacher = Column(String(30))
+    teacherGrade = Column(String(30))
 
-    tags = Column(String)
+    tags = Column(Text)
 
     def __repr__(self):
         return "<Rating(rOverall = %r)>" %self.rOverall
-
-
-
-
-
-    
