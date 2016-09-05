@@ -25,7 +25,7 @@
 * 5.4 ItemLoader
 
 #### 6 Store in MySQL
-* 6.1.1 Build models
+* 6.1 Build models
 * 6.2 Evoke pipeline
 
 #### 7 Set, Configurate and Run
